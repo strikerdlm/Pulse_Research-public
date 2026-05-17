@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Newsreader", serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  --color-void: #0a0e16;
+  --color-panel: #131722;
+  --color-panel-2: #1a1f2c;
+  --color-rule: #1f2a3a;
+  --color-rule-bright: #2f3d54;
+
+  --color-ink: #e8e3d6;
+  --color-ink-faded: #6b7283;
+  --color-ink-quiet: #3a4252;
+
+  --color-signal: #d4a657;
+  --color-signal-dim: #8b6e3a;
+  --color-trace: #7fb4c9;
+  --color-warn: #c44545;
+  --color-spec: #82a87c;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background-color: var(--color-signal);
+  color: var(--color-void);
+}
+
+/* Subtle scrollbar; matches the panel tone */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule-bright) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-rule-bright);
+  border-radius: 0;
+}
+
+/* A single keyframes for the Mission Control pulsing dot */
+@keyframes signal-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(130, 168, 124, 0.4);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 4px rgba(130, 168, 124, 0);
+  }
+}
+
+.signal-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--color-spec);
+  animation: signal-pulse 2.4s ease-in-out infinite;
+}
+.signal-dot-warn {
+  background-color: var(--color-warn);
+}
+
+/* A diagonal-stripe grain overlay used on the Hero panel */
+.grain {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 22px,
+    rgba(212, 166, 87, 0.02) 22px,
+    rgba(212, 166, 87, 0.02) 23px
+  );
+}
+
+/* First-load reveal */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.reveal {
+  animation: reveal 480ms ease-out both;
+}
