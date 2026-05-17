@@ -3,7 +3,10 @@
 # the public repo even if someone ever copies these directories in.
 # ─────────────────────────────────────────────────────────────────────
 paper/
-docs/
+# docs/ is internal-only EXCEPT for docs/assets (public README screenshots).
+# Use docs/* (not docs/) so the whitelist below can re-include a subdirectory.
+docs/*
+!docs/assets/
 HANDOFF.md
 AGENTS.md
 CLAUDE.md

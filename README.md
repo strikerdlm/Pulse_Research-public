@@ -2,12 +2,43 @@
 
 # Pulse_Research
 
-**An orthogonal-oracle Gaussian-process surrogate, coupled through a no-fitted-parameter arterial-oxygen-content equation, for rapid-onset +Gz-induced loss of consciousness under FiO₂-equivalent hypoxia.**
+*An orthogonal-oracle Gaussian-process surrogate, coupled through a no-fitted-parameter arterial-oxygen-content equation, for rapid-onset +Gz-induced loss of consciousness under FiO₂-equivalent hypoxia.*
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20248871.svg)](https://doi.org/10.5281/zenodo.20248871)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org)
+[![Status: research preview](https://img.shields.io/badge/status-research%20preview-orange.svg)](#scope-and-limitations)
+[![Validated against](https://img.shields.io/badge/validated%20against-Whinnery%20%26%20Forster%202013-darkgreen.svg)](https://doi.org/10.1186/2046-7648-2-19)
+
+<br/>
+
+<a href="docs/assets/dashboard-hero.png">
+  <img src="docs/assets/dashboard-hero.png" alt="Pulse_Research dashboard — hero panel" width="820"/>
+</a>
+
+<sub><i>Mission-control console — instrumentation × editorial scientific typography.<br/>
+Click for full resolution.</i></sub>
 
 </div>
+
+---
+
+<details>
+<summary><b>Table of contents</b></summary>
+
+- [Overview](#overview)
+- [Validation snapshot (Phase 7.3)](#validation-snapshot-phase-73)
+- [Dashboard](#dashboard)
+- [Architecture](#architecture)
+- [Repository layout](#repository-layout)
+- [Quick start](#quick-start)
+- [Scope and limitations](#scope-and-limitations)
+- [Key references](#key-references)
+- [Citation](#citation)
+- [Author](#author)
+- [License](#license)
+
+</details>
 
 ---
 
@@ -30,7 +61,10 @@ t_corrected = t_CGEM · ──────────────────�
 C_aO₂ = 1.34 · Hb · S_aO₂ + 0.003 · P_aO₂
 ```
 
-Every constant in the coupling layer (Hüfner constant 1.34, Henry coefficient 0.003, Hb = 14.5 g/dL, P_aCO₂ = 40 mmHg, RQ = 0.8, altitude = 0 m) is read from canonical clinical references *before* any contact with the validation anchor. **No coupling parameter is fitted to data.**
+Every constant in the coupling layer (Hüfner constant 1.34, Henry coefficient 0.003, Hb = 14.5 g/dL, P_aCO₂ = 40 mmHg, RQ = 0.8, altitude = 0 m) is read from canonical clinical references *before* any contact with the validation anchor.
+
+> [!IMPORTANT]
+> **No coupling parameter is fitted to data.** The Hüfner ratio is a closed-form identity drawn from clinical canon; the validation anchor — Whinnery & Forster (2013) — is touched only as a held-out test set.
 
 ## Validation snapshot (Phase 7.3)
 
@@ -51,39 +85,63 @@ Anchored on the Whinnery & Forster (2013) centrifuge corpus (888 G-LOC episodes 
 
 Conformal coverage is over the surrogate's reproduction of the deterministic CGEM × Hüfner composite output — an emulator-calibration diagnostic, not a prediction interval on real-pilot variability.
 
+<div align="center">
+  <a href="docs/assets/dashboard-validation-lab.png">
+    <img src="docs/assets/dashboard-validation-lab.png" alt="Validation Lab — Hüfner coupling, Whinnery envelope, coupling-layer ablation, split-conformal coverage" width="820"/>
+  </a>
+  <br/>
+  <sub><i>Validation Lab section of the console — each panel binds to a JSON export under <code>exports/</code>.</i></sub>
+</div>
+
+## Dashboard
+
+A single-page React 19 + Vite + ECharts console exposes the live Phase 7.3 snapshot. Every panel is bound to a JSON artefact written by the deterministic pipeline; the dashboard never re-computes a number from scratch.
+
+<div align="center">
+  <a href="docs/assets/dashboard-full-page.png">
+    <img src="docs/assets/dashboard-full-page.png" alt="Pulse_Research full-page dashboard" width="640"/>
+  </a>
+  <br/>
+  <sub><i>Full-page composite — hero, Validation Lab, design-space, and Sobol tornado.</i></sub>
+</div>
+
+Launch the dashboard locally with `npm run dev` inside [`frontend/`](frontend/) (see [Quick start](#quick-start)). The Validation Lab page reads from a frozen Phase 7.3 snapshot and requires no backend.
+
 ## Architecture
 
-```
-┌────────────────────────────┐         ┌─────────────────────────┐
-│  CGEM acceleration arm     │         │  Pulse hypoxia arm      │
-│  (Fortran G-LOC simulator) │         │  (Pulse Engine v4.3.1)  │
-│                            │         │                         │
-│  feature translator drops  │         │  FiO₂ threshold selects │
-│  fio2_inspired and         │         │  one of 3 pre-built     │
-│  sao2_baseline             │         │  hypobaric env files    │
-│                            │         │                         │
-│  → conditional event-time  │         │  → arterial saturation  │
-│    E[t | event=1]          │         │    min over window      │
-└────────────┬───────────────┘         └────────────┬────────────┘
-             │                                      │
-             ▼                                      ▼
-     ┌─────────────────────────────────────────────────────┐
-     │  ARD-Matérn-5/2 Gaussian-process surrogates         │
-     │  (per arm, on its active design columns)            │
-     └────────────────────────┬────────────────────────────┘
-                              │
-                              ▼
-     ┌─────────────────────────────────────────────────────┐
-     │  Multiplicative composition through                 │
-     │  Hüfner CaO₂(S_aO₂, P_aO₂) ratio                    │
-     │  (no fitted parameter)                              │
-     └────────────────────────┬────────────────────────────┘
-                              │
-                              ▼
-     ┌─────────────────────────────────────────────────────┐
-     │  Split-conformal calibration (Vovk et al., 2005)    │
-     │  Mondrian-stratified by altitude tier               │
-     └─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  subgraph ACC["Acceleration arm — CGEM (Copeland & Whinnery, 2023)"]
+    direction TB
+    A1["+Gz–time profile<br/>(peak Gz, onset rate, duration)"]
+    A2["Feature translator<br/><i>drops</i> fio2_inspired, sao2_baseline"]
+    A3["Conditional event-time<br/>E[t | event = 1]"]
+    A1 --> A2 --> A3
+  end
+
+  subgraph HYP["Hypoxia arm — Pulse Physiology Engine v4.3.1 (Bray et al., 2019)"]
+    direction TB
+    B1["FiO₂ inspired"]
+    B2["Tier selector → 1 of 3<br/>pre-built hypobaric env files<br/>(sea-level / 3000 m / 4000 m)"]
+    B3["Arterial saturation<br/>min over window"]
+    B1 --> B2 --> B3
+  end
+
+  GP["ARD Matérn-5/2 Gaussian processes<br/>(one per arm, on its active design columns)"]
+  HUF["Multiplicative composition through<br/>Hüfner CaO₂(S_aO₂, P_aO₂) ratio<br/><b>(no fitted parameter)</b>"]
+  CONF["Split-conformal calibration (Vovk et al., 2005)<br/>Mondrian-stratified by altitude tier"]
+  OUT["Corrected G-LOC tolerance time<br/>+ marginal coverage interval"]
+
+  ACC --> GP
+  HYP --> GP
+  GP --> HUF --> CONF --> OUT
+
+  classDef arm fill:#0f172a,stroke:#94a3b8,color:#e2e8f0;
+  classDef block fill:#1e293b,stroke:#cbd5e1,color:#f1f5f9;
+  classDef hero fill:#7c2d12,stroke:#fed7aa,color:#fff7ed;
+  class A1,A2,A3,B1,B2,B3 arm;
+  class GP,CONF block;
+  class HUF,OUT hero;
 ```
 
 ## Repository layout
@@ -170,19 +228,14 @@ The continuous FiO₂ dependence in the corrected-time surface enters analytical
 - Vovk V, Gammerman A, Shafer G. *Algorithmic Learning in a Random World.* Springer; 2005.
 - Whinnery JE, Forster EM. The +Gz-induced loss of consciousness curve. *Extrem Physiol Med.* 2013;2(1):19. [doi:10.1186/2046-7648-2-19](https://doi.org/10.1186/2046-7648-2-19)
 
-## Author
-
-**Dr. Diego Malpica, MD** — Dirección de Medicina Aeroespacial, Fuerza Aérea Colombiana, Bogotá, Colombia. Aerospace medicine physician, researcher, pilot.
-
-[github.com/strikerdlm](https://github.com/strikerdlm) · <dlmalpica@me.com>
-
 ## Citation
 
 If you use this software in your research, please cite the archived release:
 
 > Malpica D. *Pulse_Research: an orthogonal-oracle Gaussian-process surrogate for +Gz × hypoxia G-LOC tolerance* (Version 0.1.0) [Computer software]. Zenodo; 2026. [doi:10.5281/zenodo.20248871](https://doi.org/10.5281/zenodo.20248871)
 
-BibTeX:
+<details>
+<summary>BibTeX</summary>
 
 ```bibtex
 @software{malpica_pulse_research_2026,
@@ -197,7 +250,15 @@ BibTeX:
 }
 ```
 
-A machine-readable `CITATION.cff` is included at the repository root.
+</details>
+
+A machine-readable [`CITATION.cff`](CITATION.cff) is included at the repository root — GitHub's "Cite this repository" widget reads it automatically.
+
+## Author
+
+**Dr. Diego Malpica, MD** — Dirección de Medicina Aeroespacial, Fuerza Aérea Colombiana, Bogotá, Colombia. Aerospace medicine physician, researcher, pilot.
+
+[github.com/strikerdlm](https://github.com/strikerdlm) · <dlmalpica@me.com>
 
 ## License
 
