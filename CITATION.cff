@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Pulse_Research: an orthogonal-oracle Gaussian-process surrogate for +Gz × hypoxia G-LOC tolerance"
+abstract: >-
+  A no-fitted-parameter multi-fidelity surrogate composing the CAMI G-Effects
+  Model (CGEM) and the Pulse Physiology Engine through a Hüfner arterial-oxygen
+  -content ratio, with ARD Matérn-5/2 Gaussian-process emulators and split-
+  conformal coverage, for rapid-onset +Gz-induced loss of consciousness under
+  FiO₂-equivalent hypoxia.
+type: software
+authors:
+  - family-names: Malpica
+    given-names: Diego
+    email: dlmalpica@me.com
+    affiliation: "Dirección de Medicina Aeroespacial, Fuerza Aérea Colombiana, Bogotá, Colombia"
+version: "0.1.0"
+date-released: "2026-05-17"
+license: MIT
+repository-code: "https://github.com/strikerdlm/Pulse_Research-public"
+url: "https://doi.org/10.5281/zenodo.20248871"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.20248871
+    description: "Zenodo archived release"
+keywords:
+  - aerospace-medicine
+  - G-LOC
+  - hypoxia
+  - multi-fidelity
+  - gaussian-process
+  - conformal-prediction
+  - CGEM
+  - Pulse-Physiology-Engine

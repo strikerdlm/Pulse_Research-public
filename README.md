@@ -4,6 +4,9 @@
 
 **An orthogonal-oracle Gaussian-process surrogate, coupled through a no-fitted-parameter arterial-oxygen-content equation, for rapid-onset +Gz-induced loss of consciousness under FiO₂-equivalent hypoxia.**
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20248871.svg)](https://doi.org/10.5281/zenodo.20248871)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 </div>
 
 ---
@@ -172,6 +175,29 @@ The continuous FiO₂ dependence in the corrected-time surface enters analytical
 **Dr. Diego Malpica, MD** — Dirección de Medicina Aeroespacial, Fuerza Aérea Colombiana, Bogotá, Colombia. Aerospace medicine physician, researcher, pilot.
 
 [github.com/strikerdlm](https://github.com/strikerdlm) · <dlmalpica@me.com>
+
+## Citation
+
+If you use this software in your research, please cite the archived release:
+
+> Malpica D. *Pulse_Research: an orthogonal-oracle Gaussian-process surrogate for +Gz × hypoxia G-LOC tolerance* (Version 0.1.0) [Computer software]. Zenodo; 2026. [doi:10.5281/zenodo.20248871](https://doi.org/10.5281/zenodo.20248871)
+
+BibTeX:
+
+```bibtex
+@software{malpica_pulse_research_2026,
+  author    = {Malpica, Diego},
+  title     = {Pulse\_Research: an orthogonal-oracle Gaussian-process surrogate
+               for +Gz $\times$ hypoxia G-LOC tolerance},
+  version   = {0.1.0},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.20248871},
+  url       = {https://doi.org/10.5281/zenodo.20248871}
+}
+```
+
+A machine-readable `CITATION.cff` is included at the repository root.
 
 ## License
 
